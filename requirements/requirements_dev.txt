@@ -1,0 +1,13 @@
+black[jupyter]
+commitizen
+coverage
+ipython
+isort
+jupytext
+mypy
+nbstripout
+pre-commit
+pydoclint
+pyupgrade
+ruff
+tqdm
