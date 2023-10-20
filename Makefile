@@ -18,7 +18,7 @@ env-create:# Create virtual environment called .venv
 	python3 -m venv .venv
 
 .PHONY: env-ishell-activate
-env-activate:# Activate virtual environment for interactive shells
+env-ishell-activate:# Activate virtual environment for interactive shells
 	echo 'source ./.venv/bin/activate' >> ~/.bashrc
 
 
