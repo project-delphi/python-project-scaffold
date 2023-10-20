@@ -1,4 +1,5 @@
 SHELL := /bin/bash
+.ONESHELL:
 
 .DEFAULT_GOAL:=help
 
@@ -16,12 +17,13 @@ list:
 env-create:# Create virtual environment called .venv
 	python3 -m venv .venv
 
-.PHONY: env-activate
-env-activate:# Activate virtual environment
-	source ./.venv/bin/activate
+.PHONY: env-ishell-activate
+env-activate:# Activate virtual environment for interactive shells
+	echo 'source ./.venv/bin/activate' >> ~/.bashrc
+
 
 .PHONY: env-deactivate
-env-deactivate:# Deactivate virtual environment
+env-deactivate:# Deactivate virtual environment, doesn't work unless virtual environment is activated
 	source deactivate
 
 .PHONY: env-delete
@@ -29,43 +31,44 @@ env-delete:# Delete environment directory .venv
 	rm -rf .venv
 
 .PHONY: env-initiate
-env-initiate: env-create env-activate# Create and activate virtual environment at .venv
+env-initiate: env-create env-ishell-activate# Create and activate virtual environment at .venv for interactive shells
 
 # 3rd party package dependencies
 
 .PHONY: install-upgrade-pip
 install-upgrade-pip:# Upgrade pip version
+	source ./.venv/bin/activate
 	pip install --upgrade pip
 
 .PHONY: install-dev
 install-dev:# Install developer dependencies (formatting, linting)
-	pip install -r requirements/requirements_dev.txt
+	source ./.venv/bin/activate
+	pip install -r requirements_dev.txt
 
-.PHONY: install-test
-install-test:# Install dependencies for testing
-	pip install -r requirements/requirements_test.txt
+
 
 .PHONY: install-run
 install-run:# Install application only dependencies
-	pip install -r requirements/requirements_run.txt
+	source ./.venv/bin/activate
+	pip install -r requirements.txt
 
 .PHONY: install
-install: install-upgrade-pip install-dev install-test install-run# Upgrade pip and install developer, test & application dependencies
+install: install-upgrade-pip install-dev install-run# Upgrade pip and install developer, test & application dependencies
 
 .PHONY: uninstall-dev
 uninstall-dev:# Uninstall developer dependencies
-	pip uninstall -r requirements/requirements_dev.txt
+	source ./.venv/bin/activate
+	pip uninstall -r requirements_dev.txt
 
-.PHONY: uninstall-test
-uninstall-test:# Uninstall test dependencies
-	pip uninstall -r requirements/requirements_test.txt
 
 .PHONY: uninstall-run
 uninstall-run:# Uninstall application only dependencies
-	pip uninstall -r requirements/requirements_run.txt
+	source ./.venv/bin/activate
+	pip uninstall -r requirements.txt
 
 .PHONY: uninstall
 uninstall:# Uninstall all dependencies
+	source ./.venv/bin/activate
 	python -m pip uninstall -y -r <(pip freeze)
 
 # Sandboxing: virtual environment & dependencies
@@ -90,10 +93,12 @@ sandbox: sandbox-destroy sandbox-new## Destroy and make a new sandbox
 
 .PHONY: lint-ruff
 lint-ruff:# Lint code using ruff for various styles and fix
+	source ./.venv/bin/activate
 	python -m ruff check --fix .
 
 .PHONY: lint-mypy
 lint-mypy:# Lint code using mypy type hints
+	source ./.venv/bin/activate
 	python -m mypy  -p src --check-untyped-defs
 
 .PHONY: lint-typecheck
@@ -107,6 +112,7 @@ lint: lint-ruff lint-typecheck## Lint code and docstrings
 
 .PHONY: format-black
 format-black:# Format code using black
+	source ./.venv/bin/activate
 	python -m black .
 
 .PHONY: format
@@ -116,10 +122,12 @@ format: format-black## Format code
 
 .PHONY: pytest
 pytest:# Run tests using pytest
+	source ./.venv/bin/activate
 	python -m pytest -vv src
 
 .PHONY: coverage
 coverage:# Test coverage analysis
+	source ./.venv/bin/activate
 	coverage run -m pytest
 
 .PHONY: tests
@@ -132,6 +140,7 @@ serve:# Serve app using microservices
 
 .PHONY: app
 app:# Run application in app.py
+	source ./.venv/bin/activate
 	python -m app.py
 
 .PHONY: run
@@ -141,6 +150,7 @@ run: app# Run applcation
 
 .PHONY: package-install
 package-install:## Install edtiable src package
+	source ./.venv/bin/activate
 	python -m pip install -e .
 
 # Cleaning code generated artifacts
@@ -197,38 +207,47 @@ setup: sandbox clean pre-commit-run tests # remake of environment along with tes
 
 .PHONY: ml-data-download
 ml-data-download:# Download data
+	source ./.venv/bin/activate
 	python -m src/ml/data_download.py
 
 .PHONY: ml-data-preprocess
 ml-data-preprocess:# Preprocess data
+	source ./.venv/bin/activate
 	python -m src/ml/data_preprocess.py
 
 .PHONY: ml-data-encode
 ml-data-encode:# Encode data
+	source ./.venv/bin/activate
 	python -m src/ml/data_encode.py
 
 .PHONY: ml-data-split
 ml-data-split:# Split data
+	source ./.venv/bin/activate
 	python -m src/ml/data_split.py
 
 .PHONY: ml-dev-train-parameters
 ml-dev-train-parameters:# Develop model by training parameters
+	source ./.venv/bin/activate
 	python -m src/ml/dev_train_parameters.py
 
 .PHONY: ml-dev-tune-hyperparameters
  ml-dev-tune-hyperparameters:# Develop model by tuning hyperparaemters
+	source ./.venv/bin/activate
 	python -m src/ml/dev_tune_hyperparameters.py
 
 .PHONY: ml-model-test-performance
 ml-model-test-performance:# Unbiased model performance estimate
+	source ./.venv/bin/activate
 	python -m src/ml/model_test_performance.py
 
 .PHONY: ml-model-upload
 ml-model-upload:# Upload model to cloud
+	source ./.venv/bin/activate
 	python -m src/ml/model_upload.py
 
 .PHONY: ml-model-serve-api
 ml-model-serve-api:# Serve model using microservices architecture
+	source ./.venv/bin/activate
 	python -m src/ml/model_serve_api.py
 
 .PHONY: ml-model-learn
@@ -260,3 +279,11 @@ deploy:
 # GITHUB_REPO_URL: ${{ secrets.GITHUB_REPO_URL }}
 # GITHUB_BRANCH: ${{ secrets.GITHUB_BRANCH }}
 # GITHUB_CONNECTION_ARN: ${{ secrets.GITHUB_CONNECTION_ARN }}
+
+.PHONY: git-add-precommit
+git-add-precommit:
+	git add . && pre-commit run
+
+.PHONY: random-password
+random-password:
+	openssl rand -hex 10
