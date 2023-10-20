@@ -75,6 +75,7 @@ uninstall:# Uninstall all dependencies
 
 .PHONY: sandbox-pre-commit-init
 sandbox-pre-commit-init:## Create a new virtual environment and install all dependencies
+	source ./.venv/bin/activate
 	pre-commit install && pre-commit autoupdate
 
 .PHONY: sandbox-new
@@ -190,6 +191,7 @@ validate: clean install format lint tests## Validate code with quality checks
 
 .PHONY: pre-commit-run
 pre-commit-run:## Run updated pre-commit formatting and linting hooks on all files
+	source ./.venv/bin/activate
 	pre-commit run --all-files
 
 .PHONY: pre-commit-run-validate
