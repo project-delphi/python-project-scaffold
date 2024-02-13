@@ -52,14 +52,14 @@ install-upgrade-pip:# Upgrade pip version
 .PHONY: install-dev
 install-dev:# Install developer dependencies (formatting, linting)
 	source ./.venv/bin/activate
-	pip install -r requirements_dev.txt
+	pip install -e ".[dev]"
 
 
 
 .PHONY: install-run
 install-run:# Install application only dependencies
 	source ./.venv/bin/activate
-	pip install -r requirements.txt
+	pip install -e .
 
 .PHONY: install
 install: install-upgrade-pip install-dev install-run# Upgrade pip and install developer, test & application dependencies
@@ -67,12 +67,12 @@ install: install-upgrade-pip install-dev install-run# Upgrade pip and install de
 .PHONY: uninstall-dev
 uninstall-dev:# Uninstall developer dependencies
 	source ./.venv/bin/activate
-	pip uninstall -r requirements_dev.txt
+	pip uninstall ".[dev]"
 
 .PHONY: uninstall-run
 uninstall-run:# Uninstall application only dependencies
 	source ./.venv/bin/activate
-	pip uninstall -r requirements.txt
+	pip uninstall .
 
 .PHONY: uninstall
 uninstall:# Uninstall all dependencies
