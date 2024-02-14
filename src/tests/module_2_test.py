@@ -1,6 +1,6 @@
 """Placeholder for module 2 tests docstring."""
 
-from utils.module_2 import bye
+from src.utils.module_2 import bye
 
 
 def test_bye() -> None:

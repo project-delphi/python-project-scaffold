@@ -3,7 +3,7 @@
 Replace with actual content.
 """
 
-from utils.module_1 import hello
+from src.utils.module_1 import hello
 
 
 def test_hello() -> None:
